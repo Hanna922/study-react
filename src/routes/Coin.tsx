@@ -1,6 +1,5 @@
 import { useLocation, useParams, useMatch } from "react-router-dom";
 import { Outlet, Link } from "react-router-dom";
-import { useEffect, useState } from "react";
 import {
   Container,
   Header,
@@ -12,6 +11,7 @@ import {
 import styled from "styled-components";
 import { useQuery } from "react-query";
 import { fetchCoinInfo, fetchCoinTickers } from "../api";
+import { Helmet } from "react-helmet-async";
 
 interface RouterState {
   state: string;
@@ -123,11 +123,17 @@ function Coin() {
   );
   const { isLoading: tickersLoading, data: tickersData } = useQuery(
     ["tickers", coinId],
-    () => fetchCoinTickers(coinId)
+    () => fetchCoinTickers(coinId),
+    {
+      refetchInterval: 5000,
+    }
   );
   const loading = infoLoading || tickersLoading;
   return (
     <Container>
+      <Helmet>
+        <title>{state ? state : loading ? "Loading..." : infoData?.name}</title>
+      </Helmet>
       <Header>
         <Title>{state ? state : loading ? "Loading..." : infoData?.name}</Title>
       </Header>
@@ -145,8 +151,8 @@ function Coin() {
               <span>${infoData?.symbol}</span>
             </OverviewItem>
             <OverviewItem>
-              <span>Open Source:</span>
-              <span>{infoData?.open_source ? "Yes" : "No"}</span>
+              <span>Price:</span>
+              <span>${tickersData?.quotes?.USD?.price?.toFixed(3)}</span>
             </OverviewItem>
           </Overview>
           <Description>{infoData?.description}</Description>

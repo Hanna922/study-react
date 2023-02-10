@@ -1,18 +1,20 @@
 import { useQuery } from "react-query";
-import axios from "axios";
-import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import styled from "styled-components";
 import { fetchCoins } from "../api";
 import { Container, Header, Title, Loader } from "../components/Components";
+import { Helmet } from "react-helmet-async";
+import { useSetRecoilState } from "recoil";
+import { isDarkAtom } from "./../atoms";
 
 const CoinsList = styled.ul``;
 
 const Coin = styled.li`
-  background-color: white;
-  color: ${(props) => props.theme.bgColor};
+  background-color: ${(props) => props.theme.cardBgColor};
+  color: ${(props) => props.theme.textColor};
   border-radius: 15px;
   margin-bottom: 10px;
+  border: 1px solid white;
   a {
     display: flex;
     align-items: center;
@@ -64,11 +66,19 @@ function Coins() {
   }, []); */
 
   const { isLoading, data } = useQuery<ICoin[]>(["allCoins"], fetchCoins);
+  const setDarkAtom = useSetRecoilState(isDarkAtom);
+  const toggleDarkAtom = () => {
+    setDarkAtom((prev) => !prev);
+  };
 
   return (
     <Container>
+      <Helmet>
+        <title>Coin</title>
+      </Helmet>
       <Header>
         <Title>Coin</Title>
+        <button onClick={toggleDarkAtom}>Toggle Mode</button>
       </Header>
       {isLoading ? (
         <Loader>Loading...</Loader>
